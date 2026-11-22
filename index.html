@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LearnAI — Adaptive Learning</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="logo">L</div>
+            <div>
+                <strong>LearnAI</strong>
+                <small>Adaptive Learning</small>
+            </div>
+        </div>
+
+        <nav class="nav">
+            <button class="active" data-page="dashboard">
+                <span class="ico">⌂</span> Dashboard
+            </button>
+            <button data-page="learn">
+                <span class="ico">▣</span> Start learning
+            </button>
+            <button data-page="progress">
+                <span class="ico">▤</span> My progress
+            </button>
+            <button data-page="studyplan">
+                <span class="ico">✦</span> Learning path
+            </button>
+            <button data-page="settings">
+                <span class="ico">⚙</span> Settings
+            </button>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <b>How LearnAI works</b><br>
+            It estimates topic mastery from your quiz responses
+            and adapts practice recommendations.
+            It is a learning prototype, not a formal assessment.
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+
+        <!-- TOP BAR -->
+        <div class="topbar">
+            <div class="welcome">
+                <h1 id="welcome">Welcome back 👋</h1>
+                <p>Let's make today's learning count.</p>
+            </div>
+
+            <div class="profile-pill">
+                <div class="avatar" id="avatar">S</div>
+                <span class="profile-name" id="profileName">Student</span>
+                <button class="btn ghost small" onclick="openProfile()">Edit</button>
+            </div>
+        </div>
+
+        <!-- DASHBOARD -->
+        <section class="page active" id="dashboard">
+
+            <div class="grid stats">
+
+                <div class="card stat">
+                    <div>
+                        <div class="label">Overall mastery</div>
+                        <div class="value" id="overall">0%</div>
+                        <div class="sub">Across tracked topics</div>
+                    </div>
+                    <div class="iconbox">🎯</div>
+                </div>
+
+                <div class="card stat">
+                    <div>
+                        <div class="label">Quizzes completed</div>
+                        <div class="value" id="quizCount">0</div>
+                        <div class="sub">Keep building consistency</div>
+                    </div>
+                    <div class="iconbox">📝</div>
+                </div>
+
+                <div class="card stat">
+                    <div>
+                        <div class="label">Topics to improve</div>
+                        <div class="value" id="weakCount">0</div>
+                        <div class="sub">Mastery below 60%</div>
+                    </div>
+                    <div class="iconbox">🌱</div>
+                </div>
+
+                <div class="card stat">
+                    <div>
+                        <div class="label">Learning streak</div>
+                        <div class="value" id="streak">0 days</div>
+                        <div class="sub">Days with a completed quiz</div>
+                    </div>
+                    <div class="iconbox">🔥</div>
+                </div>
+
+            </div>
+
+            <div class="grid main-grid">
+
+                <div class="card">
+                    <div class="section-head">
+                        <div>
+                            <h2>Choose a subject</h2>
+                            <p>Start with a quick assessment or practice a topic.</p>
+                        </div>
+                        <button class="btn primary" onclick="go('learn')">
+                            Start quiz →
+                        </button>
+                    </div>
+
+                    <div class="grid subject-grid" id="subjects"></div>
+                </div>
+
+                <div class="card">
+                    <div class="section-head">
+                        <div>
+                            <h2>Your topic mastery</h2>
+                            <p>Based on your quiz history</p>
+                        </div>
+                        <button class="btn ghost small" onclick="go('progress')">
+                            View all
+                        </button>
+                    </div>
+
+                    <div id="masteryPreview"></div>
+                </div>
+
+            </div>
+
+            <div class="card" style="margin-top:16px">
+                <div class="section-head">
+                    <div>
+                        <h2>Recent activity</h2>
+                        <p>Your latest learning sessions</p>
+                    </div>
+                </div>
+                <div id="recent"></div>
+            </div>
+
+        </section>
+
+        <!-- LEARNING PAGE -->
+        <section class="page" id="learn">
+
+            <div class="card">
+                <div class="section-head">
+                    <div>
+                        <h2>Personalized practice</h2>
+                        <p>
+                            Choose a subject and topics.
+                            LearnAI adapts the quiz to your estimated mastery.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid subject-grid" id="subjectSelect"></div>
+
+                <div style="margin-top:18px">
+                    <div class="section-head">
+                        <h2>Topics</h2>
+                        <button class="btn ghost small" onclick="toggleTopics(true)">
+                            Select all
+                        </button>
+                    </div>
+
+                    <div id="topicChecks" class="topic-list"></div>
+                </div>
+
+                <div style="margin-top:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+
+                    <label style="color:var(--muted);font-size:13px">
+                        Quiz length
+                    </label>
+
+                    <select id="quizLength">
+                        <option value="5">5 questions · quick</option>
+                        <option value="8" selected>8 questions · standard</option>
+                        <option value="12">12 questions · deep practice</option>
+                    </select>
+
+                    <button class="btn primary" onclick="startQuiz()">
+                        Start adaptive quiz
+                    </button>
+
+                </div>
+            </div>
+
+            <div class="footer-note">
+                Questions in this prototype are sample questions.
+                You can expand the question bank for more subjects and syllabus chapters.
+            </div>
+
+        </section>
+
+        <!-- QUIZ PAGE -->
+        <section class="page" id="quiz">
+
+            <div class="quiz-shell">
+
+                <div class="quiz-head">
+                    <button class="btn ghost small" onclick="quitQuiz()">
+                        ← Exit quiz
+                    </button>
+                    <span id="quizTitle">Adaptive practice</span>
+                </div>
+
+                <div class="quiz-progress">
+                    <span id="qProgress"></span>
+                </div>
+
+                <div class="card question-card">
+
+                    <div class="question-meta">
+                        <span class="tag" id="qTopic">Topic</span>
+                        <span class="tag" id="qDifficulty">Difficulty</span>
+                        <span id="qNumber">1 / 8</span>
+                    </div>
+
+                    <h2 id="qText"></h2>
+
+                    <div class="options" id="options"></div>
+
+                    <div class="feedback" id="feedback"></div>
+
+                    <div class="quiz-actions">
+                        <span class="note" id="qHint">
+                            Choose the best answer.
+                        </span>
+
+                        <button class="btn primary" id="nextBtn"
+                                disabled onclick="nextQuestion()">
+                            Next question →
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- RESULTS PAGE -->
+        <section class="page" id="results">
+
+            <div class="section-head">
+                <div>
+                    <h2>Quiz complete 🎉</h2>
+                    <p>Here's what your performance tells us.</p>
+                </div>
+
+                <button class="btn primary" onclick="go('learn')">
+                    Practice again
+                </button>
+            </div>
+
+            <div class="grid result-grid">
+
+                <div class="card">
+                    <div class="label">Your score</div>
+                    <div class="result-score" id="resultScore">0/0</div>
+                    <div id="resultMessage" class="note"></div>
+                    <div class="progress">
+                        <span id="resultBar"></span>
+                    </div>
+                    <div id="resultSub" class="note"></div>
+                </div>
+
+                <div class="card">
+                    <h2>Topic performance</h2>
+                    <div id="resultTopics"></div>
+                </div>
+
+            </div>
+
+            <div class="card" style="margin-top:16px">
+                <h2>Your next learning steps</h2>
+                <div id="resultPlan"></div>
+            </div>
+
+            <div style="margin-top:15px;display:flex;gap:10px;flex-wrap:wrap">
+                <button class="btn secondary" onclick="go('studyplan')">
+                    View full learning path
+                </button>
+                <button class="btn ghost" onclick="go('dashboard')">
+                    Back to dashboard
+                </button>
+            </div>
+
+        </section>
+
+        <!-- PROGRESS PAGE -->
+        <section class="page" id="progress">
+
+            <div class="grid main-grid">
+
+                <div class="card">
+                    <div class="section-head">
+                        <div>
+                            <h2>Mastery by topic</h2>
+                            <p>Your estimated topic knowledge</p>
+                        </div>
+                    </div>
+
+                    <div id="progressBars"></div>
+                </div>
+
+                <div class="card">
+                    <div class="section-head">
+                        <div>
+                            <h2>Learning history</h2>
+                            <p>Past quiz sessions</p>
+                        </div>
+                    </div>
+
+                    <div id="history"></div>
+                </div>
+
+            </div>
+
+            <div class="card" style="margin-top:16px">
+                <div class="section-head">
+                    <div>
+                        <h2>Mastery trend</h2>
+                        <p>Recent sessions</p>
+                    </div>
+                </div>
+
+                <div class="chart" id="trendChart"></div>
+            </div>
+
+        </section>
+
+        <!-- STUDY PLAN -->
+        <section class="page" id="studyplan">
+
+            <div class="card">
+                <div class="section-head">
+                    <div>
+                        <h2>Your learning path</h2>
+                        <p>Generated from topic mastery and quiz activity.</p>
+                    </div>
+
+                    <button class="btn secondary small" onclick="buildPlan()">
+                        Refresh plan
+                    </button>
+                </div>
+
+                <div id="fullPlan"></div>
+            </div>
+
+        </section>
+
+        <!-- SETTINGS -->
+        <section class="page" id="settings">
+
+            <div class="card">
+
+                <h2>Settings</h2>
+
+                <div class="settings-row">
+                    <div>
+                        <b>Student profile</b>
+                        <small>Change the name shown in the app.</small>
+                    </div>
+
+                    <button class="btn secondary" onclick="openProfile()">
+                        Edit profile
+                    </button>
+                </div>
+
+                <div class="settings-row">
+                    <div>
+                        <b>Stored learning data</b>
+                        <small>Progress is saved locally in this browser.</small>
+                    </div>
+
+                    <button class="btn ghost" onclick="exportData()">
+                        Export JSON
+                    </button>
+                </div>
+
+                <div class="settings-row">
+                    <div>
+                        <b>Reset progress</b>
+                        <small>Remove quizzes and mastery data from this browser.</small>
+                    </div>
+
+                    <button class="btn ghost" onclick="resetData()">
+                        Reset data
+                    </button>
+                </div>
+
+                <p class="footer-note">
+                    This demo stores data in your browser's local storage.
+                    It does not upload student records to a server.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+</div>
+
+<!-- PROFILE MODAL -->
+<div class="modal-bg" id="profileModal">
+    <div class="modal">
+        <h2>Student profile</h2>
+
+        <label for="nameInput">Your name</label>
+        <input id="nameInput" maxlength="35" placeholder="Enter your name">
+
+        <div class="modal-actions">
+            <button class="btn ghost" onclick="closeProfile()">Cancel</button>
+            <button class="btn primary" onclick="saveProfile()">Save</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
